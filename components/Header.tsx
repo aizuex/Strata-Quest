@@ -4,7 +4,9 @@ import {
   ArrowUpRight, Menu, X, ChevronDown, ChevronRight,
   Wallet, Coins, Key, PenTool, TrendingUp, Code, Globe, 
   Layers, Database, Users, Settings, Shield, Zap, Network, Lock, Server,
-  Smartphone, Gamepad2, Apple, Monitor, Brain, Bot, Sparkles, Layout, Terminal, Laptop, Cpu
+  Smartphone, Gamepad2, Apple, Monitor, Brain, Bot, Sparkles, Layout, Terminal, Laptop, Cpu,
+  Landmark, GraduationCap, ShoppingCart, Truck, Plane, Car, Leaf, Trophy, Calendar, Dumbbell, Film, Utensils, Gavel, Home, Newspaper, Tv, MessageSquare,
+  Heart, Clock
 } from 'lucide-react';
 import logoAsset from '../Copy of Purple White Modern Technology Company Z-Fold Brochure (1056 x 1056 px) (Facebook Cover) (1).png';
 
@@ -147,8 +149,11 @@ const MENU_ITEMS: MenuItem[] = [
     name: 'Industry',
     href: '/industry-use-cases',
     submenu: [
-      { title: 'Fintech & Banking', desc: 'Secure payment rails and banking API setups.', href: '/industry-use-cases' },
-      { title: 'Supply Chain Ledger', desc: 'Audit logs, provenance and tracking setups.', href: '/industry-use-cases' },
+      { title: 'Fintech Solutions', desc: 'Banking APIs, payment processing, and ledger setups.', href: '/industry-use-cases', icon: Landmark },
+      { title: 'SaaS Platforms', desc: 'Multi-tenant applications and scalable databases.', href: '/industry-use-cases', icon: Layers },
+      { title: 'eCommerce Systems', desc: 'Shopping carts, global catalogs, and payments.', href: '/industry-use-cases', icon: ShoppingCart },
+      { title: 'Education Portals', desc: 'Virtual class platforms, grading, and files.', href: '/industry-use-cases', icon: GraduationCap },
+      { title: 'IT & Consulting', desc: 'IT support, audits, and custom software systems.', href: '/industry-use-cases', icon: Cpu }
     ]
   },
   {
@@ -209,6 +214,33 @@ const SERVICES_TABS_DATA: Record<'custom' | 'software' | 'game' | 'web', Service
     ]
   }
 };
+
+const INDUSTRIES_DATA = [
+  { title: 'Healthcare', icon: Heart, colorClass: 'text-rose-500 bg-rose-500/10' },
+  { title: 'FinTech', icon: Landmark, colorClass: 'text-emerald-500 bg-emerald-500/10' },
+  { title: 'eCommerce', icon: ShoppingCart, colorClass: 'text-amber-500 bg-amber-500/10' },
+  { title: 'Education', icon: GraduationCap, colorClass: 'text-blue-500 bg-blue-500/10' },
+  { title: 'Logistics', icon: Truck, colorClass: 'text-orange-500 bg-orange-500/10' },
+  { title: 'Travel & Hospitality', icon: Plane, colorClass: 'text-cyan-500 bg-cyan-500/10' },
+  { title: 'Automotive', icon: Car, colorClass: 'text-slate-500 bg-slate-500/10' },
+  { title: 'Agriculture', icon: Leaf, colorClass: 'text-green-500 bg-green-500/10' },
+  { title: 'Gaming', icon: Gamepad2, colorClass: 'text-indigo-500 bg-indigo-500/10' },
+  { title: 'Sports', icon: Trophy, colorClass: 'text-yellow-500 bg-yellow-500/10' },
+  { title: 'On-Demand', icon: Clock, colorClass: 'text-purple-500 bg-purple-500/10' },
+  { title: 'Events', icon: Calendar, colorClass: 'text-violet-500 bg-violet-500/10' },
+  { title: 'Social Networking', icon: Users, colorClass: 'text-sky-500 bg-sky-500/10' },
+  { title: 'Fitness & Wellness', icon: Dumbbell, colorClass: 'text-red-500 bg-red-500/10' },
+  { title: 'Entertainment', icon: Film, colorClass: 'text-fuchsia-500 bg-fuchsia-500/10' },
+  { title: 'Restaurant & Food', icon: Utensils, colorClass: 'text-amber-600 bg-amber-600/10' },
+  { title: 'SaaS', icon: Layers, colorClass: 'text-indigo-600 bg-indigo-600/10' },
+  { title: 'Politics & Governance', icon: Gavel, colorClass: 'text-neutral-500 bg-neutral-500/10' },
+  { title: 'Real Estate', icon: Home, colorClass: 'text-emerald-600 bg-emerald-600/10' },
+  { title: 'Electric Vehicle', icon: Zap, colorClass: 'text-yellow-400 bg-yellow-400/10' },
+  { title: 'News & Media', icon: Newspaper, colorClass: 'text-blue-600 bg-blue-600/10' },
+  { title: 'Aviation', icon: Globe, colorClass: 'text-cyan-600 bg-cyan-600/10' },
+  { title: 'OTT', icon: Tv, colorClass: 'text-red-600 bg-red-600/10' },
+  { title: 'IT Services', icon: Cpu, colorClass: 'text-violet-600 bg-violet-600/10' }
+];
 
 const MobileAccordion: React.FC<{ item: MenuItem, onNavigate: (href: string) => void, closeMenu: () => void }> = ({ item, onNavigate, closeMenu }) => {
   const [open, setOpen] = useState(false);
@@ -596,6 +628,124 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                           >
                             <span className="flex items-center gap-1.5">
                               Explore AI Services <Sparkles className="w-3.5 h-3.5" />
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : item.name === 'Industry' ? (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-[920px] opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                    <div className={`rounded-[2rem] overflow-hidden shadow-2xl border ${isDarkHeader ? 'border-white/10 bg-slate-950/95 text-white' : 'border-black/10 bg-white/95 text-slate-900'} backdrop-blur-2xl flex flex-row`}>
+                      {/* Left/Main Column (Industry Solutions Grid) */}
+                      <div className="w-[72%] p-8 flex flex-col justify-between text-left">
+                        <div>
+                          {/* Header */}
+                          <div className="flex items-center gap-4 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                              <Globe className="w-5 h-5 stroke-[1.8]" />
+                            </div>
+                            <div>
+                              <h3 className={`text-sm font-bold tracking-tight leading-tight ${isDarkHeader ? 'text-white' : 'text-slate-900'}`}>Industry Solutions</h3>
+                              <p className={`text-[10px] font-medium mt-0.5 ${isDarkHeader ? 'text-neutral-400' : 'text-slate-500'}`}>23+ Industries We Serve</p>
+                            </div>
+                          </div>
+
+                          {/* Grid of 24 Industries */}
+                          <div className="grid grid-cols-4 gap-x-4 gap-y-3">
+                            {INDUSTRIES_DATA.map((ind, idx) => {
+                              const IndIcon = ind.icon;
+                              return (
+                                <a
+                                  key={idx}
+                                  href="/industry-use-cases"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleNav('/industry-use-cases');
+                                  }}
+                                  className={`flex items-center gap-2.5 p-1.5 rounded-xl transition-all duration-300 group/item cursor-pointer text-left ${
+                                    isDarkHeader ? 'hover:bg-white/5' : 'hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all duration-300 ${ind.colorClass}`}>
+                                    <IndIcon className="w-4 h-4 stroke-[1.8]" />
+                                  </div>
+                                  <span className={`text-[11px] font-bold font-sans tracking-wide leading-tight transition-colors duration-300 ${
+                                    isDarkHeader ? 'text-neutral-300 group-hover/item:text-white' : 'text-slate-700 group-hover/item:text-slate-950'
+                                  }`}>
+                                    {ind.title}
+                                  </span>
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div className={`mt-6 pt-4 border-t ${isDarkHeader ? 'border-white/10 text-neutral-500' : 'border-slate-100 text-slate-400'} flex items-center justify-between text-[9px] font-mono tracking-widest uppercase`}>
+                          <span>Global Enterprise Coverage</span>
+                          <span>Strata Quest Core</span>
+                        </div>
+                      </div>
+
+                      {/* Right Column (AI-Driven Card & CTA) */}
+                      <div className="w-[28%] bg-gradient-to-br from-[#0e1026] to-[#060714] p-7 flex flex-col justify-between relative overflow-hidden text-white border-l border-white/10 text-left">
+                        {/* Decorative glow */}
+                        <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-pink-600/10 blur-3xl rounded-full pointer-events-none" />
+
+                        <div>
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center">
+                              <Brain className="w-5 h-5 stroke-[1.8]" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-bold tracking-tight text-white leading-tight">AI-Driven</h3>
+                              <p className="text-[10px] font-medium text-neutral-400 mt-0.5">Solutions</p>
+                            </div>
+                          </div>
+
+                          {/* Stack of AI items */}
+                          <div className="flex flex-col gap-3">
+                            {[
+                              { title: 'Smart Automation', desc: 'Workflows & agents', icon: Sparkles },
+                              { title: 'ML Analytics', desc: 'Predictive modeling', icon: Cpu },
+                              { title: 'AI Chatbots', desc: 'Conversational engines', icon: MessageSquare }
+                            ].map((spec, i) => {
+                              const SpecIcon = spec.icon;
+                              return (
+                                <div key={i} className="flex gap-3 items-center p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 hover:bg-white/10 transition-all duration-300">
+                                  <div className="w-8 h-8 rounded-lg bg-pink-500/15 text-pink-400 flex-shrink-0 flex items-center justify-center">
+                                    <SpecIcon className="w-4 h-4 stroke-[1.8]" />
+                                  </div>
+                                  <div>
+                                    <h5 className="text-[11px] font-bold font-sans text-white tracking-wide">{spec.title}</h5>
+                                    <p className="text-[9px] text-neutral-400 mt-0.5 leading-normal font-medium">{spec.desc}</p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Global Presence Section */}
+                          <div className="mt-5">
+                            <h4 className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2 font-bold">Global Presence</h4>
+                            <div className="flex gap-2">
+                              {['USA', 'UK', 'India'].map((country) => (
+                                <span key={country} className="flex-1 py-1 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-center text-neutral-300">
+                                  {country}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pink/Purple Gradient CTA Button */}
+                        <div className="mt-6">
+                          <button
+                            onClick={() => handleNav('/ai-development')}
+                            className="w-full py-2.5 bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-400 hover:to-violet-500 text-white rounded-xl flex items-center justify-center font-bold text-xs tracking-wide gap-2 shadow-lg shadow-pink-500/25 hover:scale-[1.02] transition-all cursor-pointer font-sans"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              AI Solutions <Sparkles className="w-3.5 h-3.5" />
                             </span>
                           </button>
                         </div>
