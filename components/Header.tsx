@@ -216,29 +216,10 @@ const SERVICES_TABS_DATA: Record<'custom' | 'software' | 'game' | 'web', Service
 };
 
 const INDUSTRIES_DATA = [
-  { title: 'Healthcare', icon: Heart, colorClass: 'text-rose-500 bg-rose-500/10' },
   { title: 'FinTech', icon: Landmark, colorClass: 'text-emerald-500 bg-emerald-500/10' },
-  { title: 'eCommerce', icon: ShoppingCart, colorClass: 'text-amber-500 bg-amber-500/10' },
   { title: 'Education', icon: GraduationCap, colorClass: 'text-blue-500 bg-blue-500/10' },
-  { title: 'Logistics', icon: Truck, colorClass: 'text-orange-500 bg-orange-500/10' },
-  { title: 'Travel & Hospitality', icon: Plane, colorClass: 'text-cyan-500 bg-cyan-500/10' },
-  { title: 'Automotive', icon: Car, colorClass: 'text-slate-500 bg-slate-500/10' },
-  { title: 'Agriculture', icon: Leaf, colorClass: 'text-green-500 bg-green-500/10' },
-  { title: 'Gaming', icon: Gamepad2, colorClass: 'text-indigo-500 bg-indigo-500/10' },
-  { title: 'Sports', icon: Trophy, colorClass: 'text-yellow-500 bg-yellow-500/10' },
-  { title: 'On-Demand', icon: Clock, colorClass: 'text-purple-500 bg-purple-500/10' },
-  { title: 'Events', icon: Calendar, colorClass: 'text-violet-500 bg-violet-500/10' },
   { title: 'Social Networking', icon: Users, colorClass: 'text-sky-500 bg-sky-500/10' },
-  { title: 'Fitness & Wellness', icon: Dumbbell, colorClass: 'text-red-500 bg-red-500/10' },
-  { title: 'Entertainment', icon: Film, colorClass: 'text-fuchsia-500 bg-fuchsia-500/10' },
-  { title: 'Restaurant & Food', icon: Utensils, colorClass: 'text-amber-600 bg-amber-600/10' },
   { title: 'SaaS', icon: Layers, colorClass: 'text-indigo-600 bg-indigo-600/10' },
-  { title: 'Politics & Governance', icon: Gavel, colorClass: 'text-neutral-500 bg-neutral-500/10' },
-  { title: 'Real Estate', icon: Home, colorClass: 'text-emerald-600 bg-emerald-600/10' },
-  { title: 'Electric Vehicle', icon: Zap, colorClass: 'text-yellow-400 bg-yellow-400/10' },
-  { title: 'News & Media', icon: Newspaper, colorClass: 'text-blue-600 bg-blue-600/10' },
-  { title: 'Aviation', icon: Globe, colorClass: 'text-cyan-600 bg-cyan-600/10' },
-  { title: 'OTT', icon: Tv, colorClass: 'text-red-600 bg-red-600/10' },
   { title: 'IT Services', icon: Cpu, colorClass: 'text-violet-600 bg-violet-600/10' }
 ];
 
@@ -647,12 +628,12 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                             </div>
                             <div>
                               <h3 className={`text-sm font-bold tracking-tight leading-tight ${isDarkHeader ? 'text-white' : 'text-slate-900'}`}>Industry Solutions</h3>
-                              <p className={`text-[10px] font-medium mt-0.5 ${isDarkHeader ? 'text-neutral-400' : 'text-slate-500'}`}>23+ Industries We Serve</p>
+                              <p className={`text-[10px] font-medium mt-0.5 ${isDarkHeader ? 'text-neutral-400' : 'text-slate-500'}`}>Key Industries We Serve</p>
                             </div>
                           </div>
 
-                          {/* Grid of 24 Industries */}
-                          <div className="grid grid-cols-4 gap-x-4 gap-y-3">
+                          {/* Grid of Industries */}
+                          <div className="grid grid-cols-3 gap-x-6 gap-y-4">
                             {INDUSTRIES_DATA.map((ind, idx) => {
                               const IndIcon = ind.icon;
                               return (
