@@ -12,3 +12,4 @@ export interface CubeProps {
 }
 
 export type IconType = 'wifi' | 'link' | 'cloud' | 'shield' | 'dots' | 'lines';
+

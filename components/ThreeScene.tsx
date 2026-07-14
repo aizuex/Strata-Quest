@@ -1,15 +1,14 @@
 import React, { useMemo, useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
-import { Environment, Float, PerspectiveCamera, RoundedBox, PresentationControls } from '@react-three/drei';
+import { Environment, Float, PerspectiveCamera, RoundedBox, PresentationControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CubeProps } from '../types';
-import { createIconTexture } from '../utils/textures';
+import stratalogoAsset from './stratalogo.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Raised floor so cubes sit visibly on the bottom of the viewport
 const PHYSICS_FLOOR_Y = -5.0;
 
 interface PhysicsState {
@@ -29,7 +28,6 @@ const WireframeShape: React.FC<{ position: [number, number, number], rotation?: 
              if (groupRef.current) {
                 gsap.to(groupRef.current.position, {
                     y: -15,
-                    opacity: 0,
                     scrollTrigger: {
                         trigger: "#hero-section",
                         start: "top top",
@@ -70,18 +68,17 @@ const WireframeShape: React.FC<{ position: [number, number, number], rotation?: 
     return (
         <group ref={groupRef} position={position} rotation={new THREE.Euler(...rotation)} scale={scale}>
             <mesh ref={ref} geometry={geometry}>
-                <meshBasicMaterial color="#111" wireframe transparent opacity={0.1} />
+                <meshBasicMaterial color="#8B5CF6" wireframe transparent opacity={0.08} />
             </mesh>
         </group>
     )
 }
 
-const Cube: React.FC<CubeProps & { innerRef?: React.Ref<THREE.Group>, onPointerDown?: (e: ThreeEvent<PointerEvent>) => void }> = ({ 
+// Crystalline Network Node (Icosahedron)
+const NetworkNode: React.FC<CubeProps & { innerRef?: React.Ref<THREE.Group>, onPointerDown?: (e: ThreeEvent<PointerEvent>) => void }> = ({ 
   position, 
   rotation = [0, 0, 0], 
   color, 
-  type = 'solid', 
-  iconType, 
   scale = 1,
   innerRef,
   onPointerDown
@@ -89,24 +86,17 @@ const Cube: React.FC<CubeProps & { innerRef?: React.Ref<THREE.Group>, onPointerD
   const localRef = useRef<THREE.Group>(null);
   const ref = (innerRef || localRef) as React.MutableRefObject<THREE.Group>;
   const [hovered, setHovered] = useState(false);
-  
-  const textureMap = useMemo(() => {
-    if (!iconType) return null;
-    const url = createIconTexture(iconType, type === 'solid' && color === '#1A1A1A' ? '#FFFFFF' : '#1A1A1A');
-    const tex = new THREE.TextureLoader().load(url);
-    tex.anisotropy = 16;
-    return tex;
-  }, [iconType, color, type]);
 
   const baseMaterial = useMemo(() => new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
-      roughness: 0.3,
-      metalness: 0.1,
+      roughness: 0.15,
+      metalness: 0.85,
+      emissive: new THREE.Color(color).multiplyScalar(0.2),
   }), [color]);
 
   useFrame((state, delta) => {
       if (ref.current) {
-          const targetScale = hovered ? scale * 1.05 : scale;
+          const targetScale = hovered ? scale * 1.2 : scale;
           ref.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
       }
   });
@@ -124,30 +114,21 @@ const Cube: React.FC<CubeProps & { innerRef?: React.Ref<THREE.Group>, onPointerD
         }}
         onPointerUp={() => { document.body.style.cursor = 'grab'; }}
     >
-      <RoundedBox args={[1, 1, 1]} radius={0.08} smoothness={4} material={baseMaterial} castShadow receiveShadow>
-         {iconType && textureMap && (
-            <mesh position={[0, 0, 0.51]}>
-                <planeGeometry args={[0.8, 0.8]} />
-                <meshBasicMaterial map={textureMap} transparent opacity={0.9} />
-            </mesh>
-         )}
-      </RoundedBox>
+      <mesh material={baseMaterial}>
+         <icosahedronGeometry args={[0.38, 0]} />
+      </mesh>
     </group>
   );
 };
 
-const HeroFloatingCubes = () => {
+const HeroFloatingNodes = () => {
     const groupRef = useRef<THREE.Group>(null);
     const { viewport } = useThree();
     
-    // Adjust positions based on viewport to keep them visible but not obstructive
     const isMobile = viewport.width < 7;
     
-    // Position 1: Top Right (or top center on mobile)
     const pos1: [number, number, number] = isMobile ? [1.2, 3.5, 0] : [-2.5, 1.5, 2];
-    // Position 2: Far Left (or bottom left on mobile)
     const pos2: [number, number, number] = isMobile ? [-1.2, -3.5, 0] : [-6, -2.5, 2];
-    // Position 3: Bottom Left near CTA
     const pos3: [number, number, number] = isMobile ? [1.2, -1.5, -2] : [-3.5, -2.8, 2.5];
 
     useLayoutEffect(() => {
@@ -157,7 +138,6 @@ const HeroFloatingCubes = () => {
         mm.add("(min-width: 1px)", () => {
              gsap.to(groupRef.current!.position, {
                 y: 10, 
-                opacity: 0,
                 scrollTrigger: {
                     trigger: "#hero-section",
                     start: "top top",
@@ -167,105 +147,129 @@ const HeroFloatingCubes = () => {
             });
         });
         return () => mm.revert();
-    }, [isMobile]); // Re-run if mobile state changes
+    }, [isMobile]);
 
     return (
         <group ref={groupRef}>
             <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.5}>
-                <Cube position={pos1} color="#94A3B8" scale={0.6} rotation={[0.5, 0.5, 0]} />
+                <NetworkNode position={pos1} color="#8B5CF6" scale={0.7} rotation={[0.5, 0.5, 0]} />
             </Float>
             <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.4}>
-                <Cube position={pos2} color="#1A1A1A" scale={0.5} iconType="link" rotation={[-0.2, 0.4, 0.2]} />
+                <NetworkNode position={pos2} color="#111827" scale={0.6} rotation={[-0.2, 0.4, 0.2]} />
             </Float>
              <Float speed={1.3} rotationIntensity={0.6} floatIntensity={0.4}>
-                <Cube position={pos3} color="#F8FAFC" scale={0.4} iconType="wifi" rotation={[0.1, -0.2, 0.1]} />
+                <NetworkNode position={pos3} color="#00E5FF" scale={0.5} rotation={[0.1, -0.2, 0.1]} />
             </Float>
         </group>
     )
 }
 
-const RubiksCube = () => {
-    const topSliceRef = useRef<THREE.Group>(null);
-    const midSliceRef = useRef<THREE.Group>(null);
-    const botSliceRef = useRef<THREE.Group>(null);
+const StrataOrbits = () => {
     const mainGroupRef = useRef<THREE.Group>(null);
+    const quantumCoreRef = useRef<THREE.Mesh>(null);
+    const coreDiskRef = useRef<THREE.Mesh>(null);
+    const quantumCoreGroupRef = useRef<THREE.Group>(null);
     const cubesRefs = useRef<THREE.Group[]>([]);
+    const spinningRingRefs = useRef<THREE.Group[]>([]);
     
-    // Track idle animation so we can pause/play it
+    const tl2Ref = useRef<gsap.core.Timeline | null>(null);
     const idleTimeline = useRef<gsap.core.Timeline | null>(null);
     
-    // Physics system
     const physics = useRef<PhysicsState>({ active: false, velocities: [], offsets: [] });
-    
-    // Dragging state
     const dragRef = useRef<number | null>(null);
 
-    const { viewport, mouse, camera, gl } = useThree();
+    const { viewport, mouse, camera } = useThree();
+    const [showLabels, setShowLabels] = useState(true);
+    const [logoTexture, setLogoTexture] = useState<THREE.Texture | null>(null);
 
-    // Grid data
-    const slices = useMemo(() => {
-        const top = [], mid = [], bot = [];
-        const gap = 1.05;
-        const colors = ['#FFFFFF', '#94A3B8', '#1A1A1A', '#CBD5E1', '#F8FAFC', '#475569'];
-
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                for (let z = -1; z <= 1; z++) {
-                    const colorIndex = Math.floor(Math.random() * colors.length);
-                    let iconType: CubeProps['iconType'] | undefined = undefined;
-
-                    if (z === 1 && x === 0 && y === 0) iconType = 'link';
-                    else if (z === -1 && x === 0 && y === 0) iconType = 'dots';
-                    else if (y === 1 && x === 0 && z === 0) iconType = 'wifi';
-                    else if (x === 1 && y === 0 && z === 0) iconType = 'cloud';
-                    else if (x === -1 && y === 0 && z === 0) iconType = 'shield';
-                    
-                    const cubeData = {
-                        localPosition: [x * gap, 0, z * gap] as [number, number, number], 
-                        color: colors[colorIndex],
-                        iconType,
-                        id: `${x}-${y}-${z}`
-                    };
-
-                    if (y === 1) top.push(cubeData);
-                    else if (y === 0) mid.push(cubeData);
-                    else bot.push(cubeData);
-                }
-            }
-        }
-        return { top, mid, bot };
+    // Scroll listener to toggle showLabels based on scroll height to avoid projection calculations on scroll
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowLabels(window.scrollY < 350);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Asynchronous texture load to prevent Suspense layout recalculations triggers
     useEffect(() => {
-        const totalCubes = 27;
-        for(let i=0; i<totalCubes; i++) {
+        const loader = new THREE.TextureLoader();
+        loader.load(stratalogoAsset, (tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.anisotropy = 16;
+            tex.needsUpdate = true;
+            setLogoTexture(tex);
+        });
+    }, []);
+
+    // Concentric Orbit rings data with labels
+    const ringsData = useMemo(() => [
+        { id: 'ring-0', radius: 2.2, color: '#00E5FF', tilt: [0.7, 0.1, 0.2] as [number, number, number], speed: 0.8, label: 'AI Layer' },
+        { id: 'ring-1', radius: 1.8, color: '#8B5CF6', tilt: [-0.5, 0.3, 0.4] as [number, number, number], speed: -0.6, label: 'Consensus Ledger' },
+        { id: 'ring-2', radius: 1.4, color: '#D946EF', tilt: [0.3, -0.4, -0.3] as [number, number, number], speed: 1.0, label: 'Liquidity Core' },
+        { id: 'ring-3', radius: 1.0, color: '#FFFFFF', tilt: [0.1, 0.5, -0.2] as [number, number, number], speed: -0.5, label: 'Infrastructure' }
+    ], []);
+
+    const nodesData = useMemo(() => {
+        const nodes = [];
+        const colors = ['#00E5FF', '#8B5CF6', '#FFFFFF', '#D946EF', '#94A3B8', '#F1F5F9'];
+        
+        // Dynamic labels for node names matching IT/Blockchain infra
+        const nodeLabels: Record<string, string> = {
+            '0-0': 'Validator #1',
+            '0-2': 'Tensor Core',
+            '1-1': 'Solidity VM',
+            '1-3': 'MPC Vault',
+            '2-0': 'AI Model v4',
+            '2-2': 'Liquidity Pool',
+            '3-1': 'Docker Host'
+        };
+
+        for (let ringIndex = 0; ringIndex < 4; ringIndex++) {
+            const ring = ringsData[ringIndex];
+            for (let i = 0; i < 4; i++) {
+                const angle = (i * Math.PI) / 2;
+                const colorIndex = (ringIndex + i) % colors.length;
+                const key = `${ringIndex}-${i}`;
+                
+                nodes.push({
+                    id: `node-${ringIndex}-${i}`,
+                    ringIndex,
+                    angle,
+                    color: colors[colorIndex],
+                    orbitPosition: new THREE.Vector3(),
+                    nodeLabel: nodeLabels[key] || null
+                });
+            }
+        }
+        return nodes;
+    }, [ringsData]);
+
+    useEffect(() => {
+        const totalItems = 20;
+        for(let i=0; i<totalItems; i++) {
             physics.current.velocities.push(new THREE.Vector3(0,0,0));
             physics.current.offsets.push(new THREE.Vector3(0,0,0));
         }
     }, []);
 
-    // Setup dedicated ScrollTrigger for idle animation state
     useEffect(() => {
-        // Start playing initially
         idleTimeline.current?.play();
 
         const st = ScrollTrigger.create({
             trigger: "#details-section",
             start: "center center", 
             onEnter: () => {
-                 // Stop rotation when entering the breakdown phase
                  idleTimeline.current?.pause();
-                 // Resetting rotations happens in the breakdown timeline
             },
             onLeaveBack: () => {
-                 // Resume when going back up to details/hero
                  idleTimeline.current?.play();
             }
         });
         return () => st.kill();
     }, []);
     
-    // Add global pointer up listener to stop dragging
     useEffect(() => {
         const handlePointerUp = () => {
             dragRef.current = null;
@@ -274,7 +278,7 @@ const RubiksCube = () => {
         return () => window.removeEventListener('pointerup', handlePointerUp);
     }, []);
 
-    const handleCubePointerDown = (index: number, e: ThreeEvent<PointerEvent>) => {
+    const handleNodePointerDown = (index: number, e: ThreeEvent<PointerEvent>) => {
         if (!physics.current.active) return;
         e.stopPropagation();
         // @ts-ignore
@@ -283,6 +287,55 @@ const RubiksCube = () => {
     };
 
     useFrame((state, delta) => {
+        if (quantumCoreRef.current) {
+            quantumCoreRef.current.rotation.y += delta * 0.4;
+            quantumCoreRef.current.rotation.x += delta * 0.2;
+        }
+        if (coreDiskRef.current) {
+            coreDiskRef.current.rotation.y += delta * 0.7;
+        }
+
+        const isExploded = tl2Ref.current && tl2Ref.current.progress() > 0.01;
+        const time = state.clock.getElapsedTime();
+
+        // Spin the child meshes procedurally (never GSAP target)
+        if (!physics.current.active) {
+            spinningRingRefs.current.forEach((mesh, i) => {
+                if (mesh) {
+                    const ring = ringsData[i];
+                    mesh.rotation.y += delta * ring.speed * 0.25;
+                }
+            });
+        }
+
+        // Snapping safety fallback on parent rings
+        if (!physics.current.active && !isExploded) {
+            cubesRefs.current.forEach((mesh, i) => {
+                if (mesh) {
+                    if (i < 4) {
+                        mesh.position.set(0, 0, 0);
+                        const ring = ringsData[i];
+                        mesh.rotation.set(ring.tilt[0], ring.tilt[1], ring.tilt[2]);
+                    } else {
+                        const nodeIndex = i - 4;
+                        const node = nodesData[nodeIndex];
+                        const ring = ringsData[node.ringIndex];
+                        const currentAngle = node.angle + time * ring.speed * 0.5;
+                        
+                        const basePos = new THREE.Vector3(
+                            Math.cos(currentAngle) * ring.radius,
+                            0,
+                            Math.sin(currentAngle) * ring.radius
+                        );
+                        
+                        const euler = new THREE.Euler(...ring.tilt);
+                        basePos.applyEuler(euler);
+                        mesh.position.copy(basePos);
+                    }
+                }
+            });
+        }
+
         if (!physics.current.active) return;
 
         const vec = new THREE.Vector3(mouse.x, mouse.y, 0.5);
@@ -291,11 +344,9 @@ const RubiksCube = () => {
         const distanceToFloor = (PHYSICS_FLOOR_Y - camera.position.y) / dir.y;
         const mouseWorldPos = camera.position.clone().add(dir.multiplyScalar(distanceToFloor));
         
-        // Physics constants for "Play Mode"
         const repulsionRadius = 4.0; 
         const repulsionForce = 45.0; 
         const drag = 0.96; 
-        
         const worldWidth = viewport.width / 2;
 
         cubesRefs.current.forEach((mesh, i) => {
@@ -307,36 +358,29 @@ const RubiksCube = () => {
             const meshFloorPos = new THREE.Vector3(currentWorldPos.x, PHYSICS_FLOOR_Y, currentWorldPos.z);
             const mouseFloorPos = new THREE.Vector3(mouseWorldPos.x, PHYSICS_FLOOR_Y, mouseWorldPos.z);
 
-            // DRAG LOGIC
             if (dragRef.current === i) {
                  const targetPos = mouseFloorPos.clone();
-                 // Lift slightly when dragging
-                 targetPos.y = PHYSICS_FLOOR_Y + 0.5;
+                 targetPos.y = PHYSICS_FLOOR_Y + (i < 4 ? 0.6 : 0.3);
                  
-                 // Impart velocity based on drag movement (for "throwing")
                  const moveDiff = targetPos.clone().sub(mesh.position);
                  velocity.copy(moveDiff.multiplyScalar(10));
-                 
                  mesh.position.lerp(targetPos, 0.2);
                  
-                 // Force collisions with others from the perspective of the dragged item
                  cubesRefs.current.forEach((otherMesh, j) => {
                     if (i === j || !otherMesh) return;
                     const otherPos = new THREE.Vector3();
                     otherMesh.getWorldPosition(otherPos);
                     const dist = mesh.position.distanceTo(otherPos);
-                    const minDist = 1.3;
+                    const minDist = i < 4 || j < 4 ? 2.0 : 1.0;
                     if (dist < minDist) {
                          const pushDir = otherPos.clone().sub(mesh.position).normalize();
                          const force = (minDist - dist) * 30.0;
                          physics.current.velocities[j].add(pushDir.multiplyScalar(force * delta));
                     }
                  });
-
                  return;
             }
 
-            // Mouse Interaction (Push)
             if (dragRef.current === null) {
                 const distToMouse = meshFloorPos.distanceTo(mouseFloorPos);
                 if (distToMouse < repulsionRadius) {
@@ -346,14 +390,13 @@ const RubiksCube = () => {
                 }
             }
 
-            // Cube-to-Cube Collision
             cubesRefs.current.forEach((otherMesh, j) => {
                 if (i === j || !otherMesh) return;
                 const otherPos = new THREE.Vector3();
                 otherMesh.getWorldPosition(otherPos);
                 
                 const dist = currentWorldPos.distanceTo(otherPos);
-                const minDist = 1.1; 
+                const minDist = i < 4 || j < 4 ? 1.6 : 0.8;
                 if (dist < minDist) {
                     const pushDir = currentWorldPos.clone().sub(otherPos).normalize();
                     pushDir.x += (Math.random() - 0.5) * 0.1;
@@ -363,9 +406,7 @@ const RubiksCube = () => {
                 }
             });
             
-            // Wall Collision
             const safeBoundary = Math.max(2, worldWidth - 1); 
-            
             if (mesh.position.x > safeBoundary) {
                  velocity.x *= -0.8;
                  mesh.position.x = safeBoundary;
@@ -374,20 +415,16 @@ const RubiksCube = () => {
                  mesh.position.x = -safeBoundary;
             }
 
-            // Apply Velocity
             mesh.position.x += velocity.x * delta;
             mesh.position.z += velocity.z * delta;
-            
-            // Idle bobbing
             mesh.position.y += Math.sin(state.clock.elapsedTime * 3 + i) * 0.003; 
             
-            // Friction
             velocity.multiplyScalar(drag); 
         });
     });
 
     useLayoutEffect(() => {
-        if (!mainGroupRef.current || !topSliceRef.current || !midSliceRef.current || !botSliceRef.current) return;
+        if (!mainGroupRef.current) return;
 
         const mm = gsap.matchMedia();
 
@@ -398,33 +435,19 @@ const RubiksCube = () => {
             const { isMobile } = context.conditions as { isMobile: boolean };
             const screenWidth = viewport.width;
 
-            // 1. Initial State
-            const startPos: [number,number,number] = isMobile ? [0, -2.8, 0] : [3.5, 0, 0];
+            const startPos: [number,number,number] = isMobile ? [0, -2.8, 0] : [2.2, 0, 0];
             const startScale = isMobile ? 0.65 : 0.95;
             
             mainGroupRef.current!.position.set(...startPos);
             mainGroupRef.current!.scale.set(startScale, startScale, startScale);
             mainGroupRef.current!.rotation.set(0.3, -0.5, 0);
 
-            // 2. Idle Animation
             if (idleTimeline.current) idleTimeline.current.kill();
             
-            const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2, defaults: { ease: "power3.inOut" } });
+            const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2, defaults: { ease: "power2.inOut" } });
             idleTimeline.current = tl;
-            
-            const t = 0.8;
-            tl.to(topSliceRef.current!.rotation, { y: Math.PI / 2, duration: t })
-              .to(botSliceRef.current!.rotation, { y: -Math.PI / 2, duration: t }, "<0.1")
-              .to(mainGroupRef.current!.rotation, { z: Math.PI / 2, duration: t * 1.2 }, "+=0.1")
-              .to(midSliceRef.current!.rotation, { y: Math.PI / 2, duration: t })
-              .to(topSliceRef.current!.rotation, { y: Math.PI, duration: t }, "<0.1")
-              .to(mainGroupRef.current!.rotation, { x: 0.2, y: -0.5, z: 0, duration: t * 1.5 }, "+=0.1")
-              .to(midSliceRef.current!.rotation, { y: 0, duration: t }, "+=0.2")
-              .to(topSliceRef.current!.rotation, { y: 0, duration: t }, "<")
-              .to(botSliceRef.current!.rotation, { y: 0, duration: t }, "<");
+            tl.to(mainGroupRef.current!.rotation, { y: Math.PI * 2, duration: 20, ease: "none" });
 
-
-            // 3. Scroll to Details
             const centerPosDetails: [number,number,number] = isMobile ? [0, 0.5, 0] : [0, -2.5, 0];
             const detailScale = isMobile ? 0.6 : 0.9;
 
@@ -439,9 +462,8 @@ const RubiksCube = () => {
                 }
             });
             
-            // NOTE: REMOVED slice rotation resets here to allow idle animation to continue through Section 2
             tl1.to(mainGroupRef.current!.rotation, {
-                x: 0.2, y: Math.PI * 0.25, z: 0, duration: 1, ease: "power2.inOut"
+                x: 0.2, y: Math.PI * 0.45, z: 0, duration: 1, ease: "power2.inOut"
             }, 0)
             .to(mainGroupRef.current!.position, {
                 x: centerPosDetails[0], y: centerPosDetails[1], z: centerPosDetails[2], ease: "power1.inOut"
@@ -450,7 +472,6 @@ const RubiksCube = () => {
                 x: detailScale, y: detailScale, z: detailScale, ease: "power1.inOut"
             }, 0);
 
-            // 4. Scroll to Breakdown
             const centerPosBreakdown = [0, 0, 0];
             const breakdownScale = isMobile ? 0.55 : 0.8;
 
@@ -463,11 +484,7 @@ const RubiksCube = () => {
                     scrub: 1,
                 }
             });
-
-            // FIRST: Reset Slices to flat before exploding
-            tl2.to([topSliceRef.current!.rotation, midSliceRef.current!.rotation, botSliceRef.current!.rotation], { 
-                x: 0, y: 0, z: 0, duration: 0.3, ease: "power2.inOut"
-            }, 0);
+            tl2Ref.current = tl2;
 
             tl2.to(mainGroupRef.current!.position, {
                 x: centerPosBreakdown[0], y: centerPosBreakdown[1], z: centerPosBreakdown[2],
@@ -482,37 +499,40 @@ const RubiksCube = () => {
                 ease: "power2.inOut"
             }, 0);
 
-            cubesRefs.current.forEach((mesh) => {
+            const ringTargetsY = [2.0, 0.7, -0.7, -2.0];
+            cubesRefs.current.forEach((mesh, i) => {
                 if(!mesh) return;
-                const parentY = 
-                    slices.top.find(c => c.id === mesh.userData.id) ? 1.05 : 
-                    slices.bot.find(c => c.id === mesh.userData.id) ? -1.05 : 0;
                 
-                const direction = new THREE.Vector3(mesh.position.x, parentY, mesh.position.z).normalize();
-                if (direction.length() === 0) direction.set(0,1,0); 
+                if (i < 4) {
+                    tl2.to(mesh.position, {
+                        x: 0, y: ringTargetsY[i], z: 0, ease: "power2.inOut"
+                    }, 0);
+                    tl2.to(mesh.rotation, {
+                        x: Math.PI / 2, y: 0, z: 0, ease: "power2.inOut"
+                    }, 0);
+                } else {
+                    const nodeIndex = i - 4;
+                    const group = Math.floor(nodeIndex / 4);
+                    
+                    const directions = [
+                        [-4.2, 2.5, 0.5],  
+                        [4.2, 2.5, 0.5],   
+                        [-4.2, -2.5, 0.5], 
+                        [4.2, -2.5, 0.5]   
+                    ];
+                    
+                    const dir = directions[group];
+                    const scatterRange = 0.5;
+                    const targetX = dir[0] + (Math.random() - 0.5) * scatterRange;
+                    const targetY = dir[1] + (Math.random() - 0.5) * scatterRange;
+                    const targetZ = dir[2] + (Math.random() - 0.5) * scatterRange;
 
-                // Reduce horizontal spread to avoid overlapping side text in Section 3
-                const safeSpread = Math.min(3.0, screenWidth * 0.25); 
-                const explodeDist = safeSpread + Math.random() * 2;
-                
-                // Bias towards vertical explosion (Y) and depth (Z) rather than width (X)
-                const targetX = mesh.position.x + direction.x * (explodeDist * 0.7); 
-                const targetY = mesh.position.y + (direction.y * explodeDist) - parentY; 
-                const targetZ = mesh.position.z + direction.z * explodeDist;
-
-                tl2.to(mesh.position, {
-                    x: targetX, y: targetY, z: targetZ, ease: "power2.out"
-                }, 0);
-                
-                tl2.to(mesh.rotation, {
-                    x: Math.random() * Math.PI * 2,
-                    y: Math.random() * Math.PI * 2,
-                    z: Math.random() * Math.PI * 2,
-                    duration: 1
-                }, 0);
+                    tl2.to(mesh.position, {
+                        x: targetX, y: targetY, z: targetZ, ease: "power2.out"
+                    }, 0);
+                }
             });
 
-            // 5. Physics Drop
             const tl3 = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#breakdown-section",
@@ -521,20 +541,30 @@ const RubiksCube = () => {
                     end: "bottom bottom",
                     scrub: 1.5,
                     onLeave: () => { physics.current.active = true; },
-                    onEnterBack: () => { physics.current.active = false; physics.current.velocities.forEach(v => v.set(0,0,0)); }
+                    onEnterBack: () => { 
+                        physics.current.active = false; 
+                        physics.current.velocities.forEach(v => v.set(0,0,0)); 
+                    }
                 }
             });
 
-             cubesRefs.current.forEach((mesh, i) => {
+            cubesRefs.current.forEach((mesh, i) => {
                 if (!mesh) return;
                 
                 const dropRange = Math.max(2, screenWidth * 0.8);
                 const dropTargetX = (Math.random() - 0.5) * dropRange; 
-                const dropTargetZ = (Math.random() - 0.5) * 10; 
+                const dropTargetZ = (Math.random() - 0.5) * 6; 
                 const dropTargetY = PHYSICS_FLOOR_Y + Math.random() * 1.5; 
-                 const parentYOffset = 
-                    slices.top.find(c => c.id === mesh.userData.id) ? 1.05 : 
-                    slices.bot.find(c => c.id === mesh.userData.id) ? -1.05 : 0;
+                
+                let parentYOffset = 0;
+                if (i < 4) {
+                    parentYOffset = ringTargetsY[i];
+                } else {
+                    const nodeIndex = i - 4;
+                    const group = Math.floor(nodeIndex / 4);
+                    const directionsY = [2.5, 2.5, -2.5, -2.5];
+                    parentYOffset = directionsY[group];
+                }
 
                 const finalLocalY = dropTargetY - parentYOffset;
                 const randRot = Math.random() * Math.PI * 6;
@@ -550,17 +580,14 @@ const RubiksCube = () => {
         });
 
         return () => mm.revert();
-    }, [slices, viewport.width]); 
+    }, [ringsData, nodesData, viewport.width]); 
 
-    const addToRefs = (el: THREE.Group) => {
+    const addToRefs = (el: THREE.Group | null) => {
         if (el && !cubesRefs.current.includes(el)) cubesRefs.current.push(el);
     };
+    
     cubesRefs.current = [];
-
-    // Map through array to calculate index and pass it to handler
-    const allCubes = [...slices.top, ...slices.mid, ...slices.bot];
-    const topCount = slices.top.length;
-    const midCount = slices.mid.length;
+    spinningRingRefs.current = [];
 
     return (
         <group ref={mainGroupRef}>
@@ -575,65 +602,107 @@ const RubiksCube = () => {
                 azimuth={[-Infinity, Infinity]}
              >
                 <group>
-                    <group ref={topSliceRef} position={[0, 1.05, 0]}>
-                        {slices.top.map((c, i) => (
-                            <Cube 
-                                key={c.id} 
-                                innerRef={addToRefs} 
-                                position={c.localPosition} 
-                                color={c.color} 
-                                iconType={c.iconType} 
-                                onPointerDown={(e) => handleCubePointerDown(i, e)}
-                                {...{ userData: { id: c.id } }} 
-                            />
-                        ))}
-                    </group>
-                    <group ref={midSliceRef} position={[0, 0, 0]}>
-                         {slices.mid.map((c, i) => (
-                            <Cube 
-                                key={c.id} 
-                                innerRef={addToRefs} 
-                                position={c.localPosition} 
-                                color={c.color} 
-                                iconType={c.iconType} 
-                                onPointerDown={(e) => handleCubePointerDown(topCount + i, e)}
-                                {...{ userData: { id: c.id } }} 
-                            />
-                        ))}
-                    </group>
-                    <group ref={botSliceRef} position={[0, -1.05, 0]}>
-                         {slices.bot.map((c, i) => (
-                            <Cube 
-                                key={c.id} 
-                                innerRef={addToRefs} 
-                                position={c.localPosition} 
-                                color={c.color} 
-                                iconType={c.iconType} 
-                                onPointerDown={(e) => handleCubePointerDown(topCount + midCount + i, e)}
-                                {...{ userData: { id: c.id } }} 
-                            />
-                        ))}
-                    </group>
+                     {/* The Central Glowing Refractive glass core with inner spinning Logo Disk */}
+                     {!physics.current.active && (
+                         <group ref={quantumCoreGroupRef}>
+                             <mesh ref={quantumCoreRef} position={[0, 0, 0]}>
+                                 <sphereGeometry args={[0.66, 32, 32]} />
+                                 <meshPhysicalMaterial 
+                                     color="#00E5FF"
+                                     emissive="#8B5CF6"
+                                     emissiveIntensity={0.6}
+                                     roughness={0.1}
+                                     metalness={0.1}
+                                     transmission={0.8}
+                                     thickness={0.6}
+                                     ior={1.4}
+                                     transparent
+                                     opacity={0.3}
+                                 />
+                             </mesh>
+                             
+                             {logoTexture && (
+                                 <mesh ref={coreDiskRef} position={[0, 0, 0]}>
+                                     <circleGeometry args={[0.48, 64]} />
+                                     <meshStandardMaterial 
+                                         map={logoTexture} 
+                                         transparent={true} 
+                                         roughness={0.1} 
+                                         metalness={0.7} 
+                                         side={THREE.DoubleSide} 
+                                     />
+                                 </mesh>
+                             )}
+                         </group>
+                     )}
+
+                     {/* 4 Concentric Orbit Torus Rings with floating info labels */}
+                     {ringsData.map((ring, i) => (
+                          <group key={ring.id} ref={addToRefs} rotation={new THREE.Euler(...ring.tilt)}>
+                               <group ref={(el) => { if (el) spinningRingRefs.current[i] = el; }}>
+                                   <mesh>
+                                        <torusGeometry args={[ring.radius, 0.025, 16, 100]} />
+                                        <meshStandardMaterial 
+                                             color={ring.color} 
+                                             roughness={0.1} 
+                                             metalness={0.9} 
+                                             emissive={ring.color}
+                                             emissiveIntensity={0.3}
+                                        />
+                                   </mesh>
+                               </group>
+                               {/* Floating Info HUD label */}
+                               {showLabels && !physics.current.active && (
+                                    <Html position={[ring.radius, 0.15, 0]} distanceFactor={6} center>
+                                         <div className="px-3 py-1 rounded-full border border-white/20 bg-slate-950/85 backdrop-blur-md text-[9px] sm:text-[10px] font-mono font-bold text-white uppercase tracking-widest whitespace-nowrap select-none pointer-events-none shadow-lg transition-all duration-300">
+                                              <span style={{ color: ring.color }} className="mr-1.5 animate-pulse">●</span>
+                                              {ring.label}
+                                          </div>
+                                     </Html>
+                               )}
+                          </group>
+                     ))}
+
+                     {/* 16 Orbiting Crystalline Nodes */}
+                     {nodesData.map((node, i) => (
+                          <group key={node.id}>
+                               <NetworkNode 
+                                   innerRef={addToRefs} 
+                                   position={[0,0,0]} 
+                                   color={node.color} 
+                                   scale={0.8}
+                                   onPointerDown={(e) => handleNodePointerDown(4 + i, e)} 
+                                   {...{ userData: { id: node.id } }} 
+                               />
+                               {/* Floating Node Info tag */}
+                               {showLabels && !physics.current.active && node.nodeLabel && (
+                                    <Html position={[0, 0.55, 0]} distanceFactor={6} center>
+                                         <div className="px-2.5 py-0.5 rounded border border-white/10 bg-slate-900/80 backdrop-blur-md text-[8px] sm:text-[9px] font-mono text-neutral-300 uppercase tracking-widest whitespace-nowrap select-none pointer-events-none shadow-md">
+                                              {node.nodeLabel}
+                                          </div>
+                                     </Html>
+                               )}
+                          </group>
+                     ))}
                 </group>
-            </PresentationControls>
+             </PresentationControls>
         </group>
     );
 };
 
 const ThreeScene: React.FC = () => {
   return (
-    <div className="absolute inset-0 z-0 pointer-events-auto">
-      <Canvas shadows dpr={[1, 2]}>
+    <div className="fixed inset-0 z-0 pointer-events-auto">
+      <Canvas dpr={[1, 1.5]} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
         <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={35} />
-        <color attach="background" args={['#F3F6FB']} />
         
         <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 10, 7]} intensity={1.5} castShadow />
+        <directionalLight position={[5, 10, 7]} intensity={1.5} />
         <directionalLight position={[-5, 5, -2]} intensity={1} color="#bfdbfe" />
         <spotLight position={[0, 5, -10]} intensity={0.5} color="#ffffff" />
 
-        <RubiksCube />
-        <HeroFloatingCubes />
+        <StrataOrbits />
+        <HeroFloatingNodes />
 
         {/* Background Decorative Elements */}
         <Float speed={1} rotationIntensity={0.2} floatIntensity={0.2}>

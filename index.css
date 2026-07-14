@@ -1,0 +1,100 @@
+/* Cyber Grid Background Pattern */
+.bg-grid-pattern {
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+}
+
+.bg-grid-pattern-dark {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+}
+
+/* Glassmorphism Panel styles */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom glow animations */
+@keyframes glow-cyan {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+  }
+}
+
+@keyframes glow-purple {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.glow-hover-cyan:hover {
+  animation: glow-cyan 2s infinite;
+}
+
+.glow-hover-purple:hover {
+  animation: glow-purple 2s infinite;
+}
+
+/* Custom scrollbar to match the clean aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00e5ff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Stabilized Hero Slogan Container */
+.hero-headline-container {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+    margin-bottom: 2rem;
+}
+@media (min-width: 640px) {
+    .hero-headline-container {
+        height: 180px;
+    }
+}
+@media (min-width: 768px) {
+    .hero-headline-container {
+        height: 210px;
+    }
+}
+@media (min-width: 1024px) {
+    .hero-headline-container {
+        height: 240px;
+        margin-bottom: 2.5rem;
+    }
+}
