@@ -328,7 +328,7 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                 
                 {item.name === 'Blockchain' ? (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-[920px] opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
-                    <div className="rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-slate-950/95 backdrop-blur-2xl flex flex-row text-white">
+                    <div className={`rounded-[2rem] overflow-hidden shadow-2xl border ${isDarkHeader ? 'border-white/10 bg-slate-950/95 text-white' : 'border-black/10 bg-white/95 text-slate-900'} backdrop-blur-2xl flex flex-row`}>
                       {/* Left Column (Services Grid) */}
                       <div className="w-[58%] p-8 flex flex-col justify-between text-left">
                         <div>
@@ -338,8 +338,8 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                               <Wallet className="w-6 h-6 stroke-[1.8]" />
                             </div>
                             <div>
-                              <h3 className="text-lg font-bold tracking-tight text-white leading-tight">Blockchain Development</h3>
-                              <p className="text-xs font-medium text-neutral-400 mt-0.5">Web3 & Crypto Solutions</p>
+                              <h3 className={`text-lg font-bold tracking-tight leading-tight ${isDarkHeader ? 'text-white' : 'text-slate-900'}`}>Blockchain Development</h3>
+                              <p className={`text-xs font-medium mt-0.5 ${isDarkHeader ? 'text-neutral-400' : 'text-slate-500'}`}>Web3 & Crypto Solutions</p>
                             </div>
                           </div>
 
@@ -355,12 +355,16 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                                     e.preventDefault();
                                     handleNav(sub.href);
                                   }}
-                                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-all group/item cursor-pointer text-left"
+                                  className={`flex items-center gap-3 p-2 rounded-xl transition-all duration-300 group/item cursor-pointer text-left ${
+                                    isDarkHeader ? 'hover:bg-white/5' : 'hover:bg-slate-50'
+                                  }`}
                                 >
-                                  <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-400 flex-shrink-0 flex items-center justify-center group-hover/item:bg-[#8B5CF6] group-hover/item:text-white transition-all">
+                                  <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-400 flex-shrink-0 flex items-center justify-center group-hover/item:bg-[#8B5CF6] group-hover/item:text-white transition-all duration-300">
                                     <SubIcon className="w-4 h-4 stroke-[2]" />
                                   </div>
-                                  <span className="text-xs font-semibold text-neutral-300 group-hover/item:text-white transition-colors">
+                                  <span className={`text-xs font-semibold transition-colors duration-300 ${
+                                    isDarkHeader ? 'text-neutral-300 group-hover/item:text-white' : 'text-slate-700 group-hover/item:text-slate-950'
+                                  }`}>
                                     {sub.title}
                                   </span>
                                 </a>
@@ -369,7 +373,7 @@ export const Header: React.FC<{ isDarkHeaderOverride?: boolean }> = ({ isDarkHea
                           </div>
                         </div>
                         
-                        <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-neutral-500 text-[9px] font-mono tracking-widest uppercase">
+                        <div className={`mt-8 pt-4 border-t ${isDarkHeader ? 'border-white/10 text-neutral-500' : 'border-slate-100 text-slate-400'} flex items-center justify-between text-[9px] font-mono tracking-widest uppercase`}>
                           <span>Strata Quest Systems</span>
                           <span>Premium Web3 Core</span>
                         </div>
